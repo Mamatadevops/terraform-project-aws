@@ -22,18 +22,6 @@ variable "ec2-name" {
   default = "web-demo-ec2"
 }
 
-variable "az" {
-  default = "us-east-1d"
-}
-
-variable "alb-subnet" {
-  default = ["subnet-0823b8efa2ed2ff9d", "subnet-0a0520ba45497e315"]
-}
-
-variable "s3_bucket_name" {
-  default = "mamata6759280"
-}
-
 variable "vpc_id" {
   default = "vpc-0c15f2f16024c664d "
 }
