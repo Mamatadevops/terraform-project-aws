@@ -1,5 +1,5 @@
 variable "ami-id" {
-  default = "ami-0c614dee691cbbf37"
+  default = "ami-0d27e0fb3bac4d724"
 }
 
 variable "instance_type" {
@@ -7,15 +7,15 @@ variable "instance_type" {
 }
 
 variable "key-pair" {
-  default = "demo-web-key"
+  default = "demo-key"
 }
 
 variable "subnet_id" {
-  default = "subnet-0cea3e92229f56412"
+  default = "subnet-0a0520ba45497e315"
 }
 
 variable "sg-id" {
-  default = ["sg-02ad7a816711b725f"]
+  default = ["sg-03985cb46830d5ea9"]
 }
 
 variable "ec2-name" {
@@ -23,11 +23,11 @@ variable "ec2-name" {
 }
 
 variable "az" {
-  default = "us-east-1b"
+  default = "us-east-1d"
 }
 
 variable "alb-subnet" {
-  default = ["subnet-0cea3e92229f56412", "subnet-0e975aa3b26152d83"]
+  default = ["subnet-0823b8efa2ed2ff9d", "subnet-0a0520ba45497e315"]
 }
 
 variable "s3_bucket_name" {
@@ -35,5 +35,5 @@ variable "s3_bucket_name" {
 }
 
 variable "vpc_id" {
-  default = "vpc-0f4a30aa66878998c"
+  default = "vpc-0c15f2f16024c664d "
 }
