@@ -11,7 +11,6 @@ permissions:
   contents: read
 
 jobs:
-
   terraform:
     name: Terraform EC2
     runs-on: ubuntu-latest
@@ -33,7 +32,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.SECRETE_KEY }}
-          aws-region: ${{ variables.AWS_REGION }} 
+          aws-region: ${{ vars.AWS_REGION }}
 
       # Check AWS account
       - name: Check AWS Identity
