@@ -1,0 +1,64 @@
+name: Terraform EC2 Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: Terraform EC2
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./aws_Ec2
+
+    steps:
+
+      # Checkout GitHub repository
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          aws-access-key-id: ${{ secrets.ACCES_KEY }}
+          aws-secret-access-key: ${{ secrets.SECRETE_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # Check AWS account
+      - name: Check AWS Identity
+        run: aws sts get-caller-identity
+
+      # Install Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # Initialize Terraform
+      - name: Terraform Init
+        run: terraform init
+
+      # Format check
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      # Validate
+      - name: Terraform Validate
+        run: terraform validate
+
+      # Plan
+      - name: Terraform Plan
+        run: terraform plan -input=false
+
+      # Apply
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
