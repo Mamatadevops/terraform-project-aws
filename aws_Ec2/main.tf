@@ -10,4 +10,3 @@ resource "aws_instance" "web-ec2" {
     Name = var.ec2-name
   }
 }
-

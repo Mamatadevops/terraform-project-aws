@@ -22,3 +22,6 @@ variable "ec2-name" {
   default = "web-demo-ec2"
 }
 
+variable "vpc_id" {
+  default = "vpc-0c15f2f16024c664d "
+}
