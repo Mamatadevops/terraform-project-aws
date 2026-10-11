@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: Create EC2 instance using CloudFormation
+
+Parameters:
+
+  AmiId:
+    Type: AWS::EC2::Image::Id
+    Default: ami-0d27e0fb3bac4d724
+    Description: EC2 AMI ID
+
+  InstanceType:
+    Type: String
+    Default: t3.micro
+    Description: EC2 instance type
+
+  KeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: demo-key
+    Description: EC2 Key Pair name
+
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-0a0520ba45497e315
+    Description: EC2 subnet ID
+
+  SecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Default: sg-03985cb46830d5ea9
+    Description: EC2 security group ID
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-0c15f2f16024c664d
+    Description: VPC ID
+
+  EC2Name:
+    Type: String
+    Default: web-demo-ec2
+    Description: EC2 instance name
+
+Resources:
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+
+    Properties:
+      ImageId: !Ref AmiId
+
+      InstanceType: !Ref InstanceType
+
+      KeyName: !Ref KeyPair
+
+      SubnetId: !Ref SubnetId
+
+      SecurityGroupIds:
+        - !Ref SecurityGroupId
+
+      Tags:
+        - Key: Name
+          Value: !Ref EC2Name
+
+Outputs:
+
+  InstanceId:
+    Description: EC2 Instance ID
+    Value: !Ref EC2Instance
+
+  PrivateIp:
+    Description: EC2 Private IP
+    Value: !GetAtt EC2Instance.PrivateIp
+
+  EC2Name:
+    Description: EC2 Instance Name
+    Value: !Ref EC2Name

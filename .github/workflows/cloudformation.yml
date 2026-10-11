@@ -1,0 +1,107 @@
+name: CloudFormation EC2 Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Choose CloudFormation action"
+        required: true
+        default: create
+        type: choice
+        options:
+          - create
+          - destroy
+
+permissions:
+  contents: read
+
+jobs:
+
+  cloudformation:
+    name: CloudFormation EC2
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Checkout repository
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          aws-access-key-id: ${{ secrets.ACCES_KEY }}
+          aws-secret-access-key: ${{ secrets.SECRETE_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # Check AWS account
+      - name: Check AWS Identity
+        run: |
+          aws sts get-caller-identity
+
+      # Validate CloudFormation template
+      - name: Validate CloudFormation
+        run: |
+          aws cloudformation validate-template \
+            --template-body file://ec2-cloudformation/ec2.yaml
+
+      # Create or Update CloudFormation Stack
+      - name: Create or Update Stack
+        if: |
+          github.event_name == 'push' ||
+          (github.event_name == 'workflow_dispatch' &&
+           github.event.inputs.action == 'create')
+        run: |
+          aws cloudformation deploy \
+            --template-file ec2-cloudformation/ec2.yaml \
+            --stack-name "${{ vars.CFN_STACK_NAME }}" \
+            --parameter-overrides \
+              AmiId="${{ vars.EC2_AMI_ID }}" \
+              InstanceType="${{ vars.EC2_INSTANCE_TYPE }}" \
+              KeyPair="${{ vars.EC2_KEY_PAIR }}" \
+              SubnetId="${{ vars.EC2_SUBNET_ID }}" \
+              SecurityGroupId="${{ vars.EC2_SECURITY_GROUP_ID }}" \
+              VpcId="${{ vars.EC2_VPC_ID }}" \
+              EC2Name="${{ vars.EC2_NAME }}"
+
+      # Get CloudFormation outputs
+      - name: Get Stack Outputs
+        if: |
+          github.event_name == 'push' ||
+          (github.event_name == 'workflow_dispatch' &&
+           github.event.inputs.action == 'create')
+        run: |
+          aws cloudformation describe-stacks \
+            --stack-name "${{ vars.CFN_STACK_NAME }}" \
+            --query "Stacks[0].Outputs"
+
+      # Destroy CloudFormation Stack
+      - name: Destroy Stack
+        if: |
+          github.event_name == 'workflow_dispatch' &&
+          github.event.inputs.action == 'destroy'
+        run: |
+          aws cloudformation delete-stack \
+            --stack-name "${{ vars.CFN_STACK_NAME }}"
+
+      # Wait for deletion
+      - name: Wait for Stack Deletion
+        if: |
+          github.event_name == 'workflow_dispatch' &&
+          github.event.inputs.action == 'destroy'
+        run: |
+          aws cloudformation wait stack-delete-complete \
+            --stack-name "${{ vars.CFN_STACK_NAME }}"
+
+      # Confirm deletion
+      - name: Confirm Destroy
+        if: |
+          github.event_name == 'workflow_dispatch' &&
+          github.event.inputs.action == 'destroy'
+        run: |
+          echo "CloudFormation stack and EC2 resources have been deleted."
